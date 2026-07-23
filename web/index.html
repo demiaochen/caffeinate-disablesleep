@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>caffeinate &amp; disablesleep — keep your Mac awake</title>
+<meta name="description" content="Free, open source macOS menu bar app to keep your Mac awake, even with the lid closed. One click for caffeinate -disu and sudo pmset -a disablesleep 1. Native, lightweight, no Electron.">
+<link rel="canonical" href="https://cnd.demiao.cc/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="caffeinate & disablesleep — keep your Mac awake">
+<meta property="og:description" content="Free, open source menu bar app. One click for caffeinate and pmset disablesleep, lid open or shut.">
+<meta property="og:url" content="https://cnd.demiao.cc/">
+<meta property="og:image" content="https://cnd.demiao.cc/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="caffeinate & disablesleep — keep your Mac awake">
+<meta name="twitter:description" content="Free, open source menu bar app. One click for caffeinate and pmset disablesleep, lid open or shut.">
+<meta name="twitter:image" content="https://cnd.demiao.cc/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": "https://cnd.demiao.cc/#app",
+  "name": "caffeinate & disablesleep",
+  "url": "https://cnd.demiao.cc/",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "macOS 14.0 or later",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://github.com/demiaochen/caffeinate-disablesleep/blob/main/LICENSE",
+  "downloadUrl": "https://github.com/demiaochen/caffeinate-disablesleep/releases/latest/download/caffeinate-disablesleep-1.0.dmg",
+  "softwareVersion": "1.0",
+  "description": "Free, open source macOS menu bar app that keeps the Mac awake, even with the lid closed. One click for caffeinate and pmset disablesleep.",
+  "author": { "@type": "Person", "name": "Demiao Chen", "url": "https://demiao.cc/" }
+}
+</script>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="M23 6 a12 12 0 1 0 0 22 a15 15 0 0 1 0 -22 Z" fill="%231A1814"/><line x1="8" y1="28" x2="28" y2="8" stroke="%23C7362B" stroke-width="4" stroke-linecap="round"/></svg>'>
+<style>
+  :root, :root[data-theme="graphite"]{
+    --paper:#2A2A28; --panel:#333331; --ink:#E8E6E0; --dim:#ABA9A2;
+    --gray:#8B8981; --red:#D8473A;
+  }
+  :root[data-theme="gallery"]{
+    --paper:#D5D4D0; --panel:#CBCAC6; --ink:#181817; --dim:#42413D; --gray:#6B6A64;
+  }
+  :root[data-theme="porcelain"]{
+    --paper:#F2F2F0; --panel:#E9E9E6; --ink:#191918; --dim:#4B4B48; --gray:#82817B;
+  }
+  :root[data-theme="paper"]{
+    --paper:#DFDCD3; --panel:#D5D1C5; --ink:#1A1814; --dim:#4A463E; --gray:#7E786C;
+  }
+  :root[data-theme="night"]{
+    --paper:#161615; --panel:#1F1F1D; --ink:#EAE8E2; --dim:#A6A49D; --gray:#85837C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:15px; line-height:1.65;
+    min-height:100vh;
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  /* scanned-paper grain, flat, no motion anywhere */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/><feColorMatrix type="matrix" values="0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.47 0 0 0 0.5 0"/></filter><rect width="240" height="240" filter="url(%23g)"/></svg>');
+    opacity:.12; mix-blend-mode:overlay;
+  }
+  .page{position:relative; z-index:1; max-width:600px; margin:0 auto;
+        padding:clamp(28px,5vw,56px) 24px 96px;}
+
+  /* microtext registers */
+  .micro{font-size:11px; letter-spacing:.24em; color:var(--gray)}
+  .register{display:flex; justify-content:space-between; align-items:baseline;
+            margin-bottom:clamp(64px,12vh,128px)}
+
+  /* the mark */
+  .mark{display:block; margin:0 auto 40px}
+
+  h1{
+    font-size:clamp(26px,5.6vw,40px); font-weight:600; letter-spacing:-.01em;
+    text-align:center; line-height:1.25;
+  }
+  .tagline{text-align:center; color:var(--dim); margin-top:14px; font-size:15px}
+  .tags{text-align:center; margin-top:16px}
+  
+  /* the two commands */
+  .commands{
+    margin:clamp(48px,8vh,80px) auto 0; max-width:440px;
+    border:1px solid color-mix(in srgb, var(--ink) 25%, transparent); padding:20px 24px;
+    font-size:14px; line-height:2; color:var(--dim); background:var(--panel);
+  }
+  .commands b{color:var(--ink); font-weight:600}
+  .commands .c{color:var(--gray)}
+
+  .fig{margin-top:10px; text-align:center}
+
+  /* screenshot */
+  .shot{display:block; margin:clamp(56px,9vh,96px) auto 0; width:min(346px,88vw); height:auto}
+
+  /* download */
+  .dl{margin:clamp(56px,9vh,96px) auto 0; text-align:center}
+  .dl a.button{
+    display:inline-block; background:var(--ink); color:var(--paper);
+    text-decoration:none; font-size:15px; letter-spacing:.06em;
+    padding:16px 34px; border:1px solid var(--ink);
+  }
+  .dl a.button:hover{background:var(--red); border-color:var(--red); color:#fff}
+  .dl .micro{display:block; letter-spacing:.18em; margin-top:14px}
+  .src{margin-top:26px; font-size:13px}
+  .src a{color:var(--dim); text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--gray);
+        display:inline-flex; align-items:center; gap:8px}
+  .src svg{fill:var(--dim)}
+  .src a:hover svg{fill:var(--red)}
+  .src a:hover{color:var(--red); text-decoration-color:var(--red)}
+  .brew{font-family:inherit; font-size:12px; color:var(--dim); background:var(--panel);
+    border:1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+    padding:10px 16px; cursor:pointer; letter-spacing:.02em}
+  .brew:hover{border-color:var(--red); color:var(--red)}
+
+  /* sponsor */
+  .sponsor{margin-top:clamp(72px,12vh,128px); text-align:center}
+  .sponsor .micro{display:block; margin-bottom:18px; letter-spacing:.3em}
+  .sponsor a{
+    display:inline-block; border:1px solid color-mix(in srgb, var(--ink) 32%, transparent); color:var(--dim);
+    text-decoration:none; font-size:13px; padding:10px 18px; margin:0 5px 10px;
+  }
+  .sponsor a:hover{border-color:var(--red); color:var(--red)}
+
+  /* fig. 02: when to use which */
+  .when{width:min(940px,94vw);margin:clamp(56px,9vh,96px) auto 0;
+        position:relative;left:50%;transform:translateX(-50%);text-align:center}
+  .when-title{font-size:19px;font-weight:600;letter-spacing:-.01em;margin-bottom:40px}
+  .when-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .wcard{border:1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+         background:var(--panel);padding:30px 22px;display:flex;flex-direction:column;align-items:center}
+  .wcard svg{width:56px;height:56px;margin-bottom:20px}
+  .wname{font-size:14px;font-weight:600;margin-bottom:4px}
+  .wwhen{font-size:11.5px;color:var(--red);letter-spacing:.06em;margin-bottom:16px}
+  .wwhat{font-size:12px;color:var(--dim);line-height:1.85;margin-bottom:18px;flex:1}
+  .wcmd{font-size:11px;color:var(--gray);background:color-mix(in srgb, var(--ink) 8%, transparent);
+        padding:8px 12px;width:100%;box-sizing:border-box}
+  .when-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:14px 34px;margin-top:34px}
+  .when-legend span{display:inline-flex;align-items:center;gap:10px;font-size:11px;color:var(--dim)}
+  .when .fig{margin-top:22px}
+  .when-legend svg{width:24px;height:24px}
+
+  footer{
+    margin-top:clamp(72px,12vh,120px); text-align:center;
+    font-size:11px; letter-spacing:.22em; color:var(--gray); line-height:2.2;
+  }
+  footer a{color:var(--gray)}
+  footer a:hover{color:var(--red)}
+
+  /* paper flecks */
+  .fleck{position:absolute; border-radius:50%; background:var(--gray); pointer-events:none}
+
+  /* download draws the strike; hover strikes the sleep */
+  #strike{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .45s cubic-bezier(.22,1,.36,1)}
+  body.struck #strike{stroke-dashoffset:0}
+  .sleep{position:relative;white-space:nowrap}
+  .sleep::after{content:"";position:absolute;left:-2%;top:54%;height:4px;width:0;
+    background:var(--red);transform:rotate(-2deg);transition:width .22s cubic-bezier(.22,1,.36,1)}
+  body.striking .sleep::after{width:104%}
+  .cursor{display:inline-block;width:9px;height:17px;background:var(--ink);
+    vertical-align:-2px;margin-left:6px;animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  /* compact CTA under the tagline */
+  .cta{display:flex;justify-content:center;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .cta a{text-decoration:none;font-size:13px;letter-spacing:.05em;padding:12px 22px}
+  .cta a.mini-dl{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
+  .cta a.mini-dl:hover{background:var(--red);border-color:var(--red);color:#fff}
+  .cta a.mini-gh{border:1px solid color-mix(in srgb, var(--ink) 32%, transparent);color:var(--dim)}
+  .cta a.mini-gh:hover{border-color:var(--red);color:var(--red)}
+  @media (prefers-reduced-motion: reduce){
+    #strike{transition:none}
+    .sleep::after{transition:none}
+    .cursor{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="register">
+    <span class="micro">— archive 001 / macOS 14+</span>
+    <span class="micro">24 — 00</span>
+  </div>
+
+  <span class="fleck" style="top:180px;left:8%;width:3px;height:3px;opacity:.5"></span>
+  <span class="fleck" style="top:520px;right:6%;width:2px;height:2px;opacity:.4"></span>
+  <span class="fleck" style="top:1210px;left:12%;width:2px;height:2px;opacity:.4"></span>
+
+  <svg class="mark" width="128" height="128" viewBox="0 0 128 128" aria-label="a moon, struck through">
+    <path d="M83 22 a42 42 0 1 0 0 74 a53 53 0 0 1 0 -74 Z" fill="var(--ink)" opacity=".9"/>
+    <line id="strike" pathLength="1" x1="34" y1="96" x2="93" y2="24" stroke="var(--red)" stroke-width="7" stroke-linecap="round"/>
+  </svg>
+
+  <h1>caffeinate &amp; disable<span class="sleep">sleep</span></h1>
+  <p class="tagline">keep your Mac awake from the menu bar,<br>even with the lid closed.<span class="cursor" aria-hidden="true"></span></p>
+  <p class="tags micro">free · open source · native · lightweight</p>
+
+  <div class="cta">
+    <a class="mini-dl dlbtn" href="https://github.com/demiaochen/caffeinate-disablesleep/releases/latest/download/caffeinate-disablesleep-1.0.dmg">↓ download .dmg</a>
+    <a class="mini-gh" href="https://github.com/demiaochen/caffeinate-disablesleep"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" style="vertical-align:-2px;margin-right:7px;fill:currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>github</a>
+  </div>
+
+  <img class="shot" src="hero.png?v=9" width="692" height="860"
+       alt="the popover, opened from the menu bar — an 8 hour session running">
+  <p class="fig micro">fig. 01 — an 8h session, and the commands underneath</p>
+
+  <div class="commands" role="img" aria-label="the two terminal commands this app replaces">
+    <span class="c"># the two commands you keep typing:</span><br>
+    <b>$ caffeinate -disu</b><br>
+    <b>$ sudo pmset -a disablesleep 1</b><br>
+    <span class="c"># …are now one click. lid open or shut.</span>
+  </div>
+
+
+  <section class="when">
+    <h2 class="when-title">which one, when</h2>
+    <div class="when-grid">
+      <div class="wcard">
+        <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="var(--ink)"/><line x1="7" y1="27.5" x2="29" y2="5.5" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/><circle cx="30.5" cy="27" r="2.6" fill="var(--ink)"/></svg>
+        <div class="wname">awake session</div>
+        <div class="wwhen">lid open</div>
+        <div class="wwhat">awake until the timer ends.<br>closing the lid sleeps it.</div>
+        <div class="wcmd">caffeinate</div>
+      </div>
+      <div class="wcard">
+        <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="none" stroke="var(--ink)" stroke-width="2.1"/><line x1="8" y1="33" x2="28" y2="33" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round"/></svg>
+        <div class="wname">stay awake, lid closed</div>
+        <div class="wwhen">lid shut</div>
+        <div class="wwhat">never sleeps, even shut.<br>screen still sleeps and locks after inactivity.</div>
+        <div class="wcmd">disablesleep</div>
+      </div>
+      <div class="wcard">
+        <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="var(--ink)"/><line x1="7" y1="27.5" x2="29" y2="5.5" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/><line x1="8" y1="33" x2="28" y2="33" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round"/></svg>
+        <div class="wname">both</div>
+        <div class="wwhen">lid might close</div>
+        <div class="wwhat">awake until you turn it off.<br>closing the lid changes nothing.</div>
+        <div class="wcmd">caffeinate + disablesleep</div>
+      </div>
+    </div>
+    <div class="when-legend">
+      <span><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="none" stroke="var(--ink)" stroke-width="2.1"/></svg>idle</span>
+      <span><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="var(--ink)"/><line x1="7" y1="27.5" x2="29" y2="5.5" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/></svg>screen on</span>
+      <span><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M23.34 6.1 a11.81 11.81 0 1 0 0 20.8 a14.91 14.91 0 0 1 0 -20.8 Z" fill="none" stroke="var(--ink)" stroke-width="2.1"/><line x1="7" y1="27.5" x2="29" y2="5.5" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/></svg>screen off, Mac on</span>
+    </div>
+    <p class="fig micro">fig. 02, when to use which</p>
+  </section>
+
+  <div class="dl">
+    <a class="button dlbtn" href="https://github.com/demiaochen/caffeinate-disablesleep/releases/latest/download/caffeinate-disablesleep-1.0.dmg">↓&nbsp;&nbsp;download .dmg</a>
+    <span class="micro">signed &amp; notarized · 2.2 MB · free</span>
+    <p class="src" style="margin-top:22px"><button class="brew" id="brew" title="click to copy">brew install --cask demiaochen/tap/caffeinate-disablesleep</button></p>
+    <p class="src"><a href="https://github.com/demiaochen/caffeinate-disablesleep"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>source code</a></p>
+  </div>
+
+  <div class="sponsor">
+    <span class="micro">fig. 03 — keep the author awake</span>
+    <a href="https://ko-fi.com/demiaochen">☕ buy me a ko-fi</a>
+  </div>
+
+  <footer>
+    MIT license · © 2026 demiao chen<br>
+    no sleep tonight
+  </footer>
+
+</div>
+<script>
+  const brew=document.getElementById('brew'), brewCmd=brew.textContent;
+  brew.addEventListener('click',()=>{
+    navigator.clipboard.writeText(brewCmd).then(()=>{
+      brew.textContent='copied ✓';
+      setTimeout(()=>{brew.textContent=brewCmd},1200);
+    });
+  });
+  document.querySelectorAll('.dlbtn').forEach(b=>{
+    b.addEventListener('click',()=>document.body.classList.add('struck'));
+    b.addEventListener('mouseenter',()=>document.body.classList.add('striking'));
+    b.addEventListener('mouseleave',()=>document.body.classList.remove('striking'));
+  });
+</script>
+</body>
+</html>

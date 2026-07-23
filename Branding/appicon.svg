@@ -1,0 +1,32 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="plate"><rect x="100" y="100" width="824" height="824" rx="186"/></clipPath>
+    <filter id="squircleShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="paper">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.32  0 0 0 0 0.30  0 0 0 0 0.26  0 0 0 0.07 0" result="grain"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="11" result="m"/>
+      <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.40  0 0 0 0 0.38  0 0 0 0 0.33  0 0 0 0.08 0" result="mottle"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="mottle"/><feMergeNode in="grain"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#squircleShadow)"><rect x="100" y="100" width="824" height="824" rx="186" fill="#DFDCD3"/></g>
+  <g clip-path="url(#plate)">
+    <rect x="100" y="100" width="824" height="824" fill="#DFDCD3" filter="url(#paper)"/>
+    <g fill="#8D877B">
+      <circle cx="238" cy="248" r="2.4" opacity="0.5"/><circle cx="762" cy="196" r="1.8" opacity="0.4"/>
+      <circle cx="848" cy="700" r="2.2" opacity="0.45"/><circle cx="198" cy="800" r="1.6" opacity="0.4"/>
+      <circle cx="612" cy="852" r="2.0" opacity="0.35"/><circle cx="380" cy="168" r="1.5" opacity="0.35"/>
+    </g>
+
+
+    <!-- the mark: an ink moon, struck through — sleep, cancelled -->
+    <path d="M612 321 a170 170 0 1 0 0 299 a215 215 0 0 1 0 -299 Z" fill="#1A1814" opacity="0.88"/>
+    <line x1="330" y1="620" x2="700" y2="322" stroke="#C7362B" stroke-width="28" stroke-linecap="round"/>
+    <!-- the commands, as a quiet caption -->
+    <text x="512" y="772" text-anchor="middle" font-family="Menlo, 'SF Mono', monospace" font-size="40"
+          fill="#4A463E">$ caffeinate &amp; disablesleep</text>
+  </g>
+</svg>
