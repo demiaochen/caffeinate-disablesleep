@@ -1,0 +1,37 @@
+<svg width="640" height="400" viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="paper">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="g"/>
+      <feColorMatrix in="g" type="matrix"
+        values="0 0 0 0 0.32  0 0 0 0 0.30  0 0 0 0 0.26  0 0 0 0.06 0" result="grain"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="11" result="m"/>
+      <feColorMatrix in="m" type="matrix"
+        values="0 0 0 0 0.40  0 0 0 0 0.38  0 0 0 0 0.33  0 0 0 0.07 0" result="mottle"/>
+      <feMerge>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode in="mottle"/>
+        <feMergeNode in="grain"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="640" height="400" fill="#DFDCD3" filter="url(#paper)"/>
+
+  <g transform="translate(320 46)">
+    <path d="M-103 -12 a13 13 0 1 0 0 23 a17 17 0 0 1 0 -23 Z" fill="#1A1814" opacity="0.9"/>
+    <line x1="-124" y1="9" x2="-96" y2="-13" stroke="#C7362B" stroke-width="3.4" stroke-linecap="round"/>
+    <text x="-96" y="4" font-family="Menlo, 'SF Mono', monospace" font-size="15"
+          letter-spacing="1" fill="#3B372F">caffeinate &amp; disablesleep</text>
+    <text x="0" y="28" text-anchor="middle" font-family="Menlo, 'SF Mono', monospace"
+          font-size="10" letter-spacing="2" fill="#8D877B">awake / all night</text>
+  </g>
+
+  <g stroke="#8D877B" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M258 185 L378 185"/>
+    <path d="M362 169 L382 185 L362 201"/>
+  </g>
+
+  <text x="320" y="352" text-anchor="middle" font-family="Menlo, 'SF Mono', monospace"
+        font-size="11" letter-spacing="1" fill="#6B655B">drag into Applications</text>
+  <text x="608" y="384" text-anchor="end" font-family="Menlo, 'SF Mono', monospace"
+        font-size="9" letter-spacing="3" fill="#8D877B">24 — 00</text>
+</svg>
