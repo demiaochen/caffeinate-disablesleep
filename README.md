@@ -24,6 +24,13 @@ Requires macOS 14 or later.
 
 ## Using the app
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="shots/demo-dark.gif">
+    <img src="shots/demo.gif" width="346" alt="a session toggling on in the panel, the countdown ticking, then back to idle">
+  </picture>
+</p>
+
 Open the app from the menu bar, then choose how long the Mac should stay awake.
 Picking a duration starts the session immediately. Choose `∞` to keep it awake
 until you stop it.
