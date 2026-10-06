@@ -42,36 +42,61 @@ struct PopoverView: View {
             Text("caffeinate & disablesleep")
                 .font(.system(size: 11, weight: .semibold, design: .monospaced))
             Spacer()
-            HStack(spacing: 5) {
-                Circle()
-                    .fill(
-                        engine.isActive
-                            ? AnyShapeStyle(Palette.inkReverse) : AnyShapeStyle(Color(nsColor: .tertiaryLabelColor))
-                    )
-                    .frame(width: 5, height: 5)
-                Text(badgeText)
-                    .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
-                    .tracking(0.6)
-                    .foregroundStyle(engine.isActive ? AnyShapeStyle(Palette.inkReverse) : AnyShapeStyle(.secondary))
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3.5)
-            .background(
-                Capsule().fill(
-                    engine.isActive
-                        ? AnyShapeStyle(Palette.ink.opacity(0.85))
-                        : AnyShapeStyle(Color(nsColor: .quaternarySystemFill)))
-            )
+            badge
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
         .padding(.bottom, 10)
     }
 
-    /// IDLE · AWAKE · or the remaining time of a timed session.
+    /// Filled while a session runs; ink outline when only the lid lock holds
+    /// (pmset blocks all sleep then, so IDLE would be wrong); gray when idle.
+    /// The leading mark is the underline bar whenever the lid lock is on.
+    private var badge: some View {
+        let active = engine.isActive
+        let lid = engine.lidLockEngaged
+        let ink =
+            active
+            ? AnyShapeStyle(Palette.inkReverse) : lid ? AnyShapeStyle(Palette.ink) : AnyShapeStyle(.secondary)
+        return HStack(spacing: 5) {
+            if lid {
+                Capsule().fill(ink).frame(width: 8, height: 1.6)
+            } else {
+                Circle()
+                    .fill(active ? ink : AnyShapeStyle(Color(nsColor: .tertiaryLabelColor)))
+                    .frame(width: 5, height: 5)
+            }
+            Text(badgeText)
+                .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
+                .tracking(0.6)
+                .foregroundStyle(ink)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3.5)
+        .background {
+            if active {
+                Capsule().fill(Palette.ink.opacity(0.85))
+            } else if lid {
+                Capsule().strokeBorder(Palette.ink, lineWidth: 1)
+            } else {
+                Capsule().fill(Color(nsColor: .quaternarySystemFill))
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(badgeAccessibilityLabel)
+    }
+
+    /// IDLE · NO SLEEP · AWAKE · or the remaining time of a timed session.
     private var badgeText: String {
-        guard engine.isActive else { return "IDLE" }
+        guard engine.isActive else { return engine.lidLockEngaged ? "NO SLEEP" : "IDLE" }
         return engine.countdown ?? "AWAKE"
+    }
+
+    private var badgeAccessibilityLabel: String {
+        let lid = engine.lidLockEngaged ? "No sleep, even with the lid closed." : ""
+        guard engine.isActive else { return lid.isEmpty ? "Idle." : lid }
+        let awake = engine.countdown.map { "Awake, \($0) left." } ?? "Awake."
+        return lid.isEmpty ? awake : "\(awake) \(lid)"
     }
 
     // MARK: - Options

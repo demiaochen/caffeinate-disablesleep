@@ -8,11 +8,12 @@ enum Palette {
     static let inkReverse = Color(nsColor: .windowBackgroundColor)
 }
 
-/// The brand mark as a shape: a crescent moon, optionally struck through.
-/// Same geometry as the menu bar glyphs and the app icon.
+/// The brand mark as a shape: a crescent moon, optionally struck through and
+/// underlined (lid lock). Same geometry as the menu bar glyphs and the app icon.
 struct MoonGlyph: Shape {
     var struck: Bool
     var filled: Bool = true
+    var underlined: Bool = false
 
     func path(in rect: CGRect) -> Path {
         let s = min(rect.width, rect.height) / 36
@@ -37,12 +38,20 @@ struct MoonGlyph: Shape {
             line.addLine(to: CGPoint(x: 29 * s, y: 7 * s))
             moon = moon.union(line.strokedPath(StrokeStyle(lineWidth: 3 * s, lineCap: .round)))
         }
+        if underlined {
+            // StatusIcon's bar, moved down with this crescent's 1.5 offset
+            var bar = Path()
+            bar.move(to: CGPoint(x: 8 * s, y: 34.5 * s))
+            bar.addLine(to: CGPoint(x: 28 * s, y: 34.5 * s))
+            moon = moon.union(bar.strokedPath(StrokeStyle(lineWidth: 2.8 * s, lineCap: .round)))
+        }
         return moon
     }
 }
 
 /// The toggle: a flat bordered field holding the moon mark — plain moon when
-/// the Mac may sleep, struck moon while kept awake. No motion; instant.
+/// the Mac may sleep, struck moon while kept awake, underlined while the lid
+/// lock holds. No motion; instant.
 struct AwakeButton: View {
     @EnvironmentObject private var engine: AwakeEngine
     @State private var hovering = false
@@ -62,9 +71,14 @@ struct AwakeButton: View {
                         lineWidth: 1)
                 MoonGlyph(
                     struck: engine.isActive,
-                    filled: engine.isActive && engine.keepDisplayAwake
+                    filled: engine.isActive && engine.keepDisplayAwake,
+                    underlined: engine.lidLockEngaged
                 )
-                .fill(engine.isActive ? AnyShapeStyle(Palette.ink) : AnyShapeStyle(Color.secondary.opacity(0.65)))
+                // ink whenever the Mac cannot sleep; gray only when truly idle
+                .fill(
+                    engine.isActive || engine.lidLockEngaged
+                        ? AnyShapeStyle(Palette.ink) : AnyShapeStyle(Color.secondary.opacity(0.65))
+                )
                 .frame(width: 22, height: 22)
             }
             .frame(height: 46)
