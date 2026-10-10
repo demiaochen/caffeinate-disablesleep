@@ -223,6 +223,10 @@ enum LidLock {
     }
 
     /// Runs a tool to completion and returns its stdout, or nil when it could not launch.
+    /// Waits on a semaphore, not `waitUntilExit()`: that spins the run loop, and
+    /// `canInstallRule` first runs this on main from a SwiftUI body. A render
+    /// during the spin read `canInstallRule` again mid-initializer and trapped
+    /// in `dispatch_once`.
     private static func output(_ path: String, _ args: [String]) -> String? {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: path)
@@ -230,10 +234,12 @@ enum LidLock {
         let pipe = Pipe()
         process.standardOutput = pipe
         process.standardError = Pipe()
+        let exited = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in exited.signal() }
         do {
             try process.run()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
+            exited.wait()
             return String(data: data, encoding: .utf8)
         } catch {
             return nil
